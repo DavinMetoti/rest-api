@@ -1,0 +1,280 @@
+name: Customer
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - POST
+    uri: api/customers
+    metadata:
+      groupName: Customer
+      groupDescription: ''
+      subgroup: Create
+      subgroupDescription: 'Tambah data customer baru.'
+      title: ''
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        name: name
+        description: 'Nama customer.'
+        required: true
+        example: 'PT ABC'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      address:
+        name: address
+        description: 'Alamat customer.'
+        required: false
+        example: 'Jl. Sudirman No. 1'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      phone:
+        name: phone
+        description: 'Nomor telepon customer.'
+        required: false
+        example: '628123456789'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+    cleanBodyParameters:
+      name: 'PT ABC'
+      address: 'Jl. Sudirman No. 1'
+      phone: '628123456789'
+    fileParameters: []
+    responses:
+      -
+        status: 201
+        content: |-
+          {
+            "id": 1,
+            "name": "PT ABC",
+            "address": "Jl. Sudirman No. 1",
+            "phone": "628123456789"
+          }
+        headers: []
+        description: Sukses
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "status": false,
+            "message": "Invalid phone number"
+          }
+        headers: []
+        description: 'Gagal validasi'
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+    uri: 'api/customers/{id}'
+    metadata:
+      groupName: Customer
+      groupDescription: ''
+      subgroup: Update
+      subgroupDescription: 'Update data customer.'
+      title: ''
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'ID customer yang akan diupdate.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        name: name
+        description: 'Nama customer.'
+        required: false
+        example: 'PT DEF'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      address:
+        name: address
+        description: 'Alamat customer.'
+        required: false
+        example: 'Jl. Thamrin No. 2'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      phone:
+        name: phone
+        description: 'Nomor telepon customer.'
+        required: false
+        example: '628129876543'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+    cleanBodyParameters:
+      name: 'PT DEF'
+      address: 'Jl. Thamrin No. 2'
+      phone: '628129876543'
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "id": 1,
+            "name": "PT DEF",
+            "address": "Jl. Thamrin No. 2",
+            "phone": "628129876543"
+          }
+        headers: []
+        description: Sukses
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "status": false,
+            "message": "Invalid phone number"
+          }
+        headers: []
+        description: 'Gagal validasi'
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PATCH
+    uri: 'api/customers/{id}'
+    metadata:
+      groupName: Customer
+      groupDescription: ''
+      subgroup: Update
+      subgroupDescription: 'Update data customer.'
+      title: ''
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'ID customer yang akan diupdate.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        name: name
+        description: 'Nama customer.'
+        required: false
+        example: 'PT DEF'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      address:
+        name: address
+        description: 'Alamat customer.'
+        required: false
+        example: 'Jl. Thamrin No. 2'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      phone:
+        name: phone
+        description: 'Nomor telepon customer.'
+        required: false
+        example: '628129876543'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+    cleanBodyParameters:
+      name: 'PT DEF'
+      address: 'Jl. Thamrin No. 2'
+      phone: '628129876543'
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "id": 1,
+            "name": "PT DEF",
+            "address": "Jl. Thamrin No. 2",
+            "phone": "628129876543"
+          }
+        headers: []
+        description: Sukses
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "status": false,
+            "message": "Invalid phone number"
+          }
+        headers: []
+        description: 'Gagal validasi'
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
