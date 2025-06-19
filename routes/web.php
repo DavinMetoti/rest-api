@@ -7,6 +7,5 @@ Route::get('/', function () {
 });
 
 Route::get('login', function () {
-    // return a login view or message
     return 'Login page placeholder';
 })->name('login');

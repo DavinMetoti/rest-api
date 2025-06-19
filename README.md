@@ -31,7 +31,7 @@ If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Lar
 
 # REST API
 
-API backend untuk aplikasi Skynest, dibangun dengan Laravel.
+API backend untuk aplikasi, dibangun dengan Laravel.
 Mendukung fitur transaksi penjualan, customer, sales, target, dan pelaporan bulanan.
 
 ---

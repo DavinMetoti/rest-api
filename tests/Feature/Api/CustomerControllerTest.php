@@ -20,7 +20,6 @@ it('can create a customer', function () {
 });
 
 it('cannot create customer with invalid phone', function () {
-    // Mock repository or validation if needed, here just simulate
     $payload = [
         'name' => 'PT Test',
         'address' => 'Jl. Test',

@@ -82,7 +82,6 @@ class MonthlyTransactionRepository implements MonthlyTransactionRepositoryInterf
             $formattedData[] = $yearData;
         }
 
-        // Sort by year ascending
         usort($formattedData, function($a, $b) {
             return $a['name'] <=> $b['name'];
         });
@@ -389,16 +388,13 @@ class MonthlyTransactionRepository implements MonthlyTransactionRepositoryInterf
      */
     public function getMonthlySalesPerformance(int $month, int $year, ?bool $isUnderperform = null): array
     {
-        // Ambil semua sales beserta user
         $salesList = Sale::with('user')->get();
 
-        // Ambil target per sales
         $targets = SalesTarget::whereYear('active_date', $year)
             ->whereMonth('active_date', $month)
             ->get()
             ->groupBy('sales_id');
 
-        // Ambil revenue per sales
         $orders = SalesOrder::with(['items'])
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
@@ -409,7 +405,6 @@ class MonthlyTransactionRepository implements MonthlyTransactionRepositoryInterf
         foreach ($salesList as $sale) {
             $salesName = $sale->user ? $sale->user->name : null;
 
-            // Hitung revenue
             $revenue = 0;
             if (isset($orders[$sale->id])) {
                 $revenue = $orders[$sale->id]->flatMap->items->sum(function ($item) {
@@ -417,16 +412,13 @@ class MonthlyTransactionRepository implements MonthlyTransactionRepositoryInterf
                 });
             }
 
-            // Hitung target
             $target = 0;
             if (isset($targets[$sale->id])) {
                 $target = $targets[$sale->id]->sum('amount');
             }
 
-            // Persentase
             $percentage = $target > 0 ? round(($revenue / $target) * 100, 2) : 0;
 
-            // Filter underperform jika diperlukan
             if ($isUnderperform === true && !($revenue < $target)) {
                 continue;
             }
@@ -448,7 +440,6 @@ class MonthlyTransactionRepository implements MonthlyTransactionRepositoryInterf
             ];
         }
 
-        // Nama bulan
         $monthName = \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y');
 
         return [

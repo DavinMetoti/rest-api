@@ -49,7 +49,7 @@ it('cannot create sales order with invalid product', function () {
         'customer_id' => $customer->id,
         'items' => [
             [
-                'product_id' => 999999, // invalid
+                'product_id' => 999999,
                 'quantity' => 5,
                 'production_price' => 10000,
                 'selling_price' => 15000,

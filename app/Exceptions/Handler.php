@@ -32,7 +32,6 @@ class Handler extends ExceptionHandler
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
 
-        // Default behavior for web
         return redirect()->guest(route('login'));
     }
 }

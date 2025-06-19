@@ -63,7 +63,6 @@ class ImportSqlCommand extends Command
             return 1;
         }
 
-        // Show warning and ask for confirmation
         $this->warn("⚠️  WARNING: This command will run 'php artisan migrate:refresh' which will:");
         $this->warn("   • Drop all tables in the database");
         $this->warn("   • Re-run all migrations from scratch");
@@ -77,7 +76,6 @@ class ImportSqlCommand extends Command
             return 0;
         }
 
-        // Double confirmation for safety
         $doubleConfirmed = $this->confirm('This will permanently delete all data. Type "yes" to confirm you understand the risks.');
 
         if (!$doubleConfirmed) {
@@ -88,7 +86,6 @@ class ImportSqlCommand extends Command
         $this->info("🔄 Running migrate:refresh to prepare database...");
 
         try {
-            // Run migrate:refresh
             $exitCode = Artisan::call('migrate:refresh');
 
             if ($exitCode === 0) {
@@ -110,14 +107,12 @@ class ImportSqlCommand extends Command
 
             $this->info("📄 Found " . count($statements) . " SQL statements");
 
-            // Disable foreign key checks temporarily
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
             foreach ($statements as $index => $statement) {
                 $this->processStatement($statement, $index + 1);
             }
 
-            // Re-enable foreign key checks
             DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         } catch (\Exception $e) {
@@ -150,7 +145,6 @@ class ImportSqlCommand extends Command
         DB::beginTransaction();
 
         try {
-            // Main progress bar
             $mainProgress = $this->output->createProgressBar($totalStatements);
             $mainProgress->setFormat(
                 "Importing: %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%\n" .
@@ -158,7 +152,6 @@ class ImportSqlCommand extends Command
             );
             $mainProgress->start();
 
-            // Process statements in chunks
             $chunks = array_chunk($statements, $chunkSize);
 
             foreach ($chunks as $chunkIndex => $chunk) {
@@ -173,7 +166,6 @@ class ImportSqlCommand extends Command
                             DB::unprepared($statement);
                             $successCount++;
 
-                            // Update progress with current statement info
                             $currentStatement = ($chunkIndex * $chunkSize) + $statementIndex + 1;
                             $mainProgress->setMessage(
                                 "Chunk {$chunkNumber}/{$totalChunks} - Statement {$currentStatement}/{$totalStatements}"
@@ -187,13 +179,11 @@ class ImportSqlCommand extends Command
 
                     $mainProgress->advance();
 
-                    // Memory management - force garbage collection every 50 statements
                     if (($successCount + $errorCount) % 50 === 0) {
                         gc_collect_cycles();
                     }
                 }
 
-                // Show chunk completion
                 if ($chunkNumber % 10 === 0 || $chunkNumber === $totalChunks) {
                     $this->newLine();
                     $this->info("✅ Completed chunk {$chunkNumber}/{$totalChunks}");
@@ -204,10 +194,8 @@ class ImportSqlCommand extends Command
             $mainProgress->finish();
             $this->newLine(2);
 
-            // Commit transaction
             DB::commit();
 
-            // Show final results
             $endTime = microtime(true);
             $duration = round($endTime - $startTime, 2);
 
@@ -337,7 +325,6 @@ class ImportSqlCommand extends Command
         $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_schema = ?", [$databaseName]);
 
         return array_map(function($table) {
-            // Handle different property naming conventions across database drivers
             if (isset($table->table_name)) {
                 return $table->table_name;
             } elseif (isset($table->TABLE_NAME)) {
@@ -348,7 +335,6 @@ class ImportSqlCommand extends Command
                 return $table['TABLE_NAME'];
             }
 
-            // Fallback: get the first property value
             $tableArray = (array) $table;
             return reset($tableArray);
         }, $tables);
@@ -434,11 +420,9 @@ class ImportSqlCommand extends Command
     {
         $sql = "\n-- Table: {$table}\n";
 
-        // Get table structure
         $createTable = DB::select("SHOW CREATE TABLE `{$table}`")[0];
         $sql .= $createTable->{'Create Table'} . ";\n\n";
 
-        // Get table data
         $records = DB::table($table)->get();
 
         if ($records->count() > 0) {
@@ -474,20 +458,17 @@ class ImportSqlCommand extends Command
         $totalLength = strlen($sql);
         $currentPos = 0;
 
-        // Remove SQL comments
         if ($progressBar) $progressBar->setProgress(10);
         $sql = preg_replace('/--.*$/m', '', $sql);
         if ($progressBar) $progressBar->setProgress(20);
         $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
         if ($progressBar) $progressBar->setProgress(30);
 
-        // Remove MySQL specific commands that might cause issues
         $sql = preg_replace('/^\/\*!\d+.*?\*\/;?\s*$/m', '', $sql);
         if ($progressBar) $progressBar->setProgress(40);
         $sql = preg_replace('/^SET\s+.*?;?\s*$/m', '', $sql);
         if ($progressBar) $progressBar->setProgress(50);
 
-        // Split by semicolon but be careful with strings and procedures
         $statements = [];
         $current = '';
         $inString = false;
@@ -503,7 +484,6 @@ class ImportSqlCommand extends Command
                 $inString = true;
                 $stringChar = $char;
             } elseif ($inString && $char === $stringChar) {
-                // Check if it's escaped
                 if ($i > 0 && $sql[$i - 1] !== '\\') {
                     $inString = false;
                 }
@@ -519,14 +499,12 @@ class ImportSqlCommand extends Command
                 $current = '';
             }
 
-            // Update progress every 10% of parsing
             if ($progressBar && $i % intval($sqlLength / 10) === 0) {
                 $progress = 60 + (($i / $sqlLength) * 30);
                 $progressBar->setProgress(min(90, $progress));
             }
         }
 
-        // Add remaining statement if any
         $statement = trim($current);
         if (!empty($statement) && $statement !== ';') {
             $statements[] = $statement;
@@ -534,7 +512,6 @@ class ImportSqlCommand extends Command
 
         if ($progressBar) $progressBar->setProgress(95);
 
-        // Filter out empty statements and MySQL specific commands
         $filteredStatements = array_filter($statements, function($statement) {
             $statement = trim($statement);
             return !empty($statement) &&
@@ -562,14 +539,12 @@ class ImportSqlCommand extends Command
 
     private function parseStatements($sqlContent)
     {
-        // Remove comments and normalize whitespace
         $lines = explode("\n", $sqlContent);
         $cleanedLines = [];
 
         foreach ($lines as $line) {
             $line = trim($line);
 
-            // Skip empty lines and comments
             if (empty($line) ||
                 str_starts_with($line, '--') ||
                 str_starts_with($line, '/*') ||
@@ -583,7 +558,6 @@ class ImportSqlCommand extends Command
 
         $sqlContent = implode(' ', $cleanedLines);
 
-        // Split by semicolon but handle semicolons within quotes
         $statements = [];
         $currentStatement = '';
         $inQuotes = false;
@@ -596,7 +570,6 @@ class ImportSqlCommand extends Command
                 $inQuotes = true;
                 $quoteChar = $char;
             } elseif ($char === $quoteChar && $inQuotes) {
-                // Check if it's escaped
                 if ($i > 0 && $sqlContent[$i - 1] !== '\\') {
                     $inQuotes = false;
                     $quoteChar = '';
@@ -614,7 +587,6 @@ class ImportSqlCommand extends Command
             }
         }
 
-        // Add the last statement if it doesn't end with semicolon
         $lastStatement = trim($currentStatement);
         if (!empty($lastStatement)) {
             $statements[] = $lastStatement;

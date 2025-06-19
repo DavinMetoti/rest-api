@@ -93,7 +93,6 @@ class MonthlyTransactionController extends Controller
             return response()->json([
                 'error' => 'Terjadi kesalahan server',
                 'message' => 'Gagal mengambil data transaksi bulanan',
-                'debug' => $e->getMessage() // Hapus baris ini di production!
             ], 500);
         }
     }
@@ -137,7 +136,6 @@ class MonthlyTransactionController extends Controller
             return response()->json([
                 'error' => 'Terjadi kesalahan server',
                 'message' => 'Gagal mengambil data target dan transaksi bulanan',
-                'debug' => $e->getMessage() // Hapus baris ini di production!
             ], 500);
         }
     }
@@ -186,7 +184,6 @@ class MonthlyTransactionController extends Controller
             return response()->json([
                 'error' => 'Terjadi kesalahan server',
                 'message' => 'Gagal mengambil data performa sales bulanan',
-                'debug' => $e->getMessage()
             ], 500);
         }
     }
