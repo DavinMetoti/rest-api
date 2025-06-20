@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Http;
 
 class CustomerRepository implements CustomerRepositoryInterface
 {
+    /**
+     * Create new data customer.
+     *
+     * @return mixed
+     */
     public function store(array $data)
     {
         if (isset($data['phone']) && !$this->isValidPhoneNumber($data['phone'])) {
@@ -16,6 +21,11 @@ class CustomerRepository implements CustomerRepositoryInterface
         return Customer::create($data);
     }
 
+    /**
+     * Update selected data customer.
+     *
+     * @return mixed
+     */
     public function update($id, array $data)
     {
         if (isset($data['phone']) && !$this->isValidPhoneNumber($data['phone'])) {
@@ -26,6 +36,12 @@ class CustomerRepository implements CustomerRepositoryInterface
         return $customer;
     }
 
+    /**
+     * Validate phone number using Abstract API.
+     *
+     * @param string $phone
+     * @return bool
+     */
     private function isValidPhoneNumber($phone)
     {
         $apiKey = env('ABSTRACT_API_KEY');

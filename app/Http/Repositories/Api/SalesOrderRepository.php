@@ -4,11 +4,16 @@ namespace App\Http\Repositories\Api;
 
 use App\Http\Contracts\Api\SalesOrderRepositoryInterface;
 use App\Models\SalesOrder;
-use App\Models\SalesOrderItem;
 use Illuminate\Support\Facades\DB;
 
 class SalesOrderRepository implements SalesOrderRepositoryInterface
 {
+    /**
+     * Store sales order along with its items.
+     *
+     * @param array $data
+     * @return mixed
+     */
     public function store(array $data)
     {
         return DB::transaction(function () use ($data) {
@@ -19,14 +24,16 @@ class SalesOrderRepository implements SalesOrderRepositoryInterface
             ];
             $order = SalesOrder::create($orderData);
 
-            foreach ($data['items'] as $item) {
-                $order->salesOrderItems()->create([
+            $items = array_map(function ($item) {
+                return [
                     'product_id'       => $item['product_id'],
                     'quantity'         => $item['quantity'],
                     'production_price' => $item['production_price'],
                     'selling_price'    => $item['selling_price'],
-                ]);
-            }
+                ];
+            }, $data['items']);
+
+            $order->salesOrderItems()->createMany($items);
 
             return $order->load('salesOrderItems');
         });

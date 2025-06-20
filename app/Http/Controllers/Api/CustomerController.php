@@ -6,6 +6,7 @@ use App\Http\Contracts\Api\CustomerRepositoryInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\StoreRequest;
 use App\Http\Requests\Customer\UpdateRequest;
+use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Http\JsonResponse;
 
 class CustomerController extends Controller
@@ -43,12 +44,12 @@ class CustomerController extends Controller
     {
         try {
             $customer = $this->repo->store($request->validated());
-            return response()->json($customer, 201);
+            return response()->json($customer, JsonResponse::HTTP_CREATED);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage()
-            ], 422);
+            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 
@@ -79,12 +80,12 @@ class CustomerController extends Controller
     {
         try {
             $customer = $this->repo->update($id, $request->validated());
-            return response()->json($customer, 200);
+            return response()->json($customer, JsonResponse::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage()
-            ], 422);
+            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 }

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Contracts\Api\MonthlyTransactionRepositoryInterface;
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Js;
 
 /**
  * @group Laporan Transaksi Bulanan
@@ -75,25 +77,25 @@ class MonthlyTransactionController extends Controller
             return response()->json([
                 'error' => 'Parameter tidak valid',
                 'message' => 'customer_id harus berupa angka'
-            ], 400);
+            ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         if ($sales_id && !is_numeric($sales_id)) {
             return response()->json([
                 'error' => 'Parameter tidak valid',
                 'message' => 'sales_id harus berupa angka'
-            ], 400);
+            ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         try {
             $transactions = $this->monthlyRepo->getMonthlyTransactionsLast3Years($customer_id, $sales_id);
-            return response()->json($transactions, 200);
+            return response()->json($transactions, JsonResponse::HTTP_OK);
         } catch (\Exception $e) {
             Log::error('MonthlyTransaction Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json([
                 'error' => 'Terjadi kesalahan server',
                 'message' => 'Gagal mengambil data transaksi bulanan',
-            ], 500);
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -130,13 +132,13 @@ class MonthlyTransactionController extends Controller
 
         try {
             $result = $this->monthlyRepo->getMonthlyTargetsAndTransactions($year, $salesId);
-            return response()->json($result, 200);
+            return response()->json($result, JsonResponse::HTTP_OK);
         } catch (\Exception $e) {
             Log::error('MonthlyTargetsAndTransactions Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json([
                 'error' => 'Terjadi kesalahan server',
                 'message' => 'Gagal mengambil data target dan transaksi bulanan',
-            ], 500);
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -178,13 +180,13 @@ class MonthlyTransactionController extends Controller
 
         try {
             $result = $this->monthlyRepo->getMonthlySalesPerformance((int)$month, (int)$year, $isUnderperform);
-            return response()->json($result, 200);
+            return response()->json($result, JsonResponse::HTTP_OK);
         } catch (\Exception $e) {
             Log::error('MonthlySalesPerformance Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json([
                 'error' => 'Terjadi kesalahan server',
                 'message' => 'Gagal mengambil data performa sales bulanan',
-            ], 500);
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

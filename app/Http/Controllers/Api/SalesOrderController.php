@@ -51,12 +51,12 @@ class SalesOrderController extends Controller
     {
         try {
             $order = $this->repo->store($request->validated());
-            return response()->json($order, 201);
+            return response()->json($order, JsonResponse::HTTP_CREATED);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage()
-            ], 422);
+            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 }
